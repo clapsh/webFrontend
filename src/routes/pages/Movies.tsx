@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet } from 'react-router'
+import { useMovieStore } from '../../stores/movies'
 export interface ResponseData {
   Search: Movie[]
   totalResults: string
@@ -16,8 +17,9 @@ export interface Movie {
 }
 
 export default function Movies() {
-  const [searchText, setSearchText] = useState('')
-  const [inputText, setInputText] = useState('')
+  const searchText = useMovieStore(s => s.searchText)
+  const setSearchText = useMovieStore(s => s.setSearchText)
+  const [inputText, setInputText] = useState(searchText)
   const { data: movies = [] } = useQuery({
     queryKey: ['movies', searchText],
     queryFn: async () => {
