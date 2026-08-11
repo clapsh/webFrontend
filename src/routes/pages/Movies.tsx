@@ -21,9 +21,9 @@ export default function Movies() {
   const { data: movies = [] } = useQuery({
     queryKey: ['movies', searchText],
     queryFn: async () => {
-      const { data } = await axios.get<ResponseData>(
-        `https://omdbapi.com?apikey=9d38c929&s=${searchText}`
-      )
+      const { data } = await axios.post<ResponseData>('/api/movie', {
+        title: searchText
+      })
       return data.Search
     },
     staleTime: 1000 * 60 * 60 * 24, // 캐싱하는 시간(ms)

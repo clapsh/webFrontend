@@ -12,5 +12,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: [{ find: '@', replacement: '/src' }]
+  },
+  server: {
+    proxy: {
+      '/api': { target: 'http://localhost:3000' }
+    }
   }
 })
