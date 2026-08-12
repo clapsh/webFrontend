@@ -8,6 +8,7 @@ import {
 import { Link, Outlet } from 'react-router'
 import { useMovieStore } from '../../stores/movies'
 import { useInView } from 'react-intersection-observer'
+import Loader from '../../components/Loader'
 export interface ResponseDataSuccess {
   Response: 'True'
   Search: Movie[]
@@ -32,7 +33,9 @@ export default function Movies() {
   const searchText = useMovieStore(s => s.searchText)
   const setSearchText = useMovieStore(s => s.setSearchText)
   const [inputText, setInputText] = useState(searchText)
-  const { ref, inView } = useInView()
+  const { ref, inView } = useInView({
+    rootMargin: '0px 0px 500px 0px'
+  })
   const options = infiniteQueryOptions({
     queryKey: ['movies', searchText],
     queryFn: async ({ pageParam }) => {
@@ -44,7 +47,7 @@ export default function Movies() {
       if (data.Response === 'False') throw new Error(data.Error)
       return data
     },
-    staleTime: 1000 * 60 * 60 * 24, // 캐싱하는 시간(ms)
+    staleTime: 1000 * 60 * 5, // 캐싱하는 시간(ms)
     enabled: Boolean(searchText),
     placeholderData: prev => prev, // 깜빡이는 부분에 채워넣을 데이터
     getNextPageParam: (lastPage, pages) => {
@@ -53,11 +56,15 @@ export default function Movies() {
       if (currentPage < maxPage) return currentPage + 1
       return undefined
     },
-
-    initialPageParam: 1
+    initialPageParam: 1,
+    select: data => data.pages.flatMap(page => page.Search)
   })
-  const { data, fetchNextPage, isFetching, hasNextPage } =
-    useInfiniteQuery(options)
+  const {
+    data: movies,
+    fetchNextPage,
+    isFetching,
+    hasNextPage
+  } = useInfiniteQuery(options)
 
   useEffect(() => {
     if (inView) {
@@ -84,18 +91,7 @@ export default function Movies() {
       </div>
       <div>
         <ul>
-          {data?.pages.map(page => {
-            return page.Search.map(movie => {
-              return (
-                <li key={movie.imdbID}>
-                  <Link to={`/movies/${movie.imdbID}`}>
-                    {movie.Title}({movie.Year})
-                  </Link>
-                </li>
-              )
-            })
-          })}
-          {/* {movies?.map(movie => {
+          {movies?.map(movie => {
             return (
               <li key={movie.imdbID}>
                 <Link to={`/movies/${movie.imdbID}`}>
@@ -103,16 +99,15 @@ export default function Movies() {
                 </Link>
               </li>
             )
-          })} */}
+          })}
         </ul>
-        <button
+        {isFetching && <Loader className="relative" />}
+        <div
           ref={ref}
           style={{
-            display: isFetching || !hasNextPage ? 'none' : 'block'
-          }}
-          onClick={() => fetchNextPage()}>
-          더보기
-        </button>
+            display: isFetching || !hasNextPage ? 'none' : 'block',
+            height: '10px'
+          }}></div>
       </div>
       <Outlet />
     </>

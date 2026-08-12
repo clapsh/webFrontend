@@ -8,9 +8,9 @@ import Home from '../routes/pages/Home'
 import Movies from '../routes/pages/Movies'
 import MovieDetails from '../routes/pages/MovieDetails'
 // import NotFound from '@/routes/pages/NotFound'
-import { requiresAuth } from '../routes/loaders'
+//import { requiresAuth } from '../routes/loaders'
 import Loader from '../components/Loader'
-
+import Todos from '../routes/pages/Todos'
 const dynamicOptions = {
   loading: <Loader />
 }
@@ -51,6 +51,10 @@ const router = createBrowserRouter([
             element: <MovieDetails />
           }
         ]
+      },
+      {
+        path: '/todos',
+        element: <Todos />
       }
     ]
   },
