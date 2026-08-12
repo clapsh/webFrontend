@@ -43,7 +43,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/movies',
-        loader: requiresAuth,
+        //loader: requiresAuth,
         element: <Movies />,
         children: [
           {
